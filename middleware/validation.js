@@ -76,3 +76,49 @@ export function validateLogin(req, res, next) {
 
   next();
 }
+
+/**
+ * Validation middleware for photo upload
+ * Validates title, description, and imageUrl fields
+ */
+export function validatePhotoUpload(req, res, next) {
+  const { title, description, imageUrl } = req.body;
+  const errors = [];
+
+  // Validate title
+  if (!title) {
+    errors.push('Title is required');
+  } else if (typeof title !== 'string') {
+    errors.push('Title must be a string');
+  } else if (title.length < 1 || title.length > 100) {
+    errors.push('Title must be between 1 and 100 characters');
+  }
+
+  // Validate description (optional)
+  if (description !== undefined && description !== null && description !== '') {
+    if (typeof description !== 'string') {
+      errors.push('Description must be a string');
+    } else if (description.length > 500) {
+      errors.push('Description must not exceed 500 characters');
+    }
+  }
+
+  // Validate imageUrl
+  if (!imageUrl) {
+    errors.push('Image URL is required');
+  } else if (typeof imageUrl !== 'string') {
+    errors.push('Image URL must be a string');
+  } else if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+    errors.push('Image URL must be a valid URL starting with http:// or https://');
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      success: false,
+      error: errors.join(', '),
+      statusCode: 400
+    });
+  }
+
+  next();
+}

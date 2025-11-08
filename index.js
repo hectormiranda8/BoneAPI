@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import initializeDatabase from './utils/initDb.js';
 import authRoutes from './routes/auth.js';
+import photoRoutes from './routes/photos.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/photos', photoRoutes);
 
 // Error handler middleware - must be last
 app.use(errorHandler);
