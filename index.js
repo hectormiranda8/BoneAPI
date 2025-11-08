@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import initializeDatabase from './utils/initDb.js';
+import authRoutes from './routes/auth.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 
@@ -13,15 +15,22 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 
+// Middleware - order is important
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Routes
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     message: 'Backend is running'
   });
 });
+
+app.use('/api/auth', authRoutes);
+
+// Error handler middleware - must be last
+app.use(errorHandler);
 
 async function startServer() {
   try {
