@@ -84,11 +84,16 @@ router.post('/login', validateLogin, async (req, res, next) => {
     const { email, username, password } = req.body;
 
     // Find user by email or username
+    // If input contains '@', treat as email, otherwise as username
     let user;
-    if (email) {
-      user = await findUserByEmail(email);
-    } else if (username) {
-      user = await findUserByUsername(username);
+    let identifier = email || username;
+
+    if (identifier) {
+      if (identifier.includes('@')) {
+        user = await findUserByEmail(identifier);
+      } else {
+        user = await findUserByUsername(identifier);
+      }
     }
 
     // If user not found

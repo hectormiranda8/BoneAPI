@@ -2,6 +2,39 @@ import { verifyToken } from '../utils/jwt.js';
 import { findUserById } from '../utils/db.js';
 
 /**
+ * Optional authentication middleware
+ * Attaches user to request if token is provided, but doesn't fail if not
+ */
+export async function optionalAuthMiddleware(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+
+      try {
+        const decoded = verifyToken(token);
+        const user = await findUserById(decoded.userId);
+
+        if (user) {
+          req.user = {
+            id: user.id,
+            username: user.username,
+            email: user.email
+          };
+        }
+      } catch (error) {
+        // Silently fail - just don't attach user
+      }
+    }
+
+    next();
+  } catch (error) {
+    next();
+  }
+}
+
+/**
  * Authentication middleware to protect routes
  * Verifies JWT token and attaches user to request
  */

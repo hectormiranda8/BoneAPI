@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename);
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const PHOTOS_FILE = path.join(DATA_DIR, 'photos.json');
+const LIKES_FILE = path.join(DATA_DIR, 'likes.json');
 
 async function readJSON(filePath) {
   try {
@@ -102,4 +103,83 @@ export async function deletePhoto(photoId) {
 export async function findPhotoById(photoId) {
   const photos = await getPhotos();
   return photos.find(photo => photo.id === photoId);
+}
+
+// Like-related functions
+export async function getLikes() {
+  const likes = await readJSON(LIKES_FILE);
+  return likes || [];
+}
+
+export async function saveLikes(likes) {
+  await ensureDataDir();
+  await writeJSON(LIKES_FILE, likes);
+}
+
+export async function addLike(userId, photoId) {
+  const likes = await getLikes();
+  const existingLike = likes.find(
+    like => like.userId === userId && like.photoId === photoId
+  );
+
+  if (existingLike) {
+    return null;
+  }
+
+  const newLike = {
+    userId,
+    photoId,
+    createdAt: new Date().toISOString()
+  };
+
+  likes.push(newLike);
+  await saveLikes(likes);
+  return newLike;
+}
+
+export async function removeLike(userId, photoId) {
+  const likes = await getLikes();
+  const filteredLikes = likes.filter(
+    like => !(like.userId === userId && like.photoId === photoId)
+  );
+
+  if (filteredLikes.length === likes.length) {
+    return false;
+  }
+
+  await saveLikes(filteredLikes);
+  return true;
+}
+
+export async function getPhotoLikeCount(photoId) {
+  const likes = await getLikes();
+  return likes.filter(like => like.photoId === photoId).length;
+}
+
+export async function getUserLikes(userId) {
+  const likes = await getLikes();
+  return likes.filter(like => like.userId === userId);
+}
+
+export async function isPhotoLikedByUser(photoId, userId) {
+  const likes = await getLikes();
+  return likes.some(like => like.photoId === photoId && like.userId === userId);
+}
+
+export async function updatePhoto(photoId, updates) {
+  const photos = await getPhotos();
+  const photoIndex = photos.findIndex(photo => photo.id === photoId);
+
+  if (photoIndex === -1) {
+    return null;
+  }
+
+  photos[photoIndex] = {
+    ...photos[photoIndex],
+    ...updates,
+    updatedAt: new Date().toISOString()
+  };
+
+  await savePhotos(photos);
+  return photos[photoIndex];
 }
