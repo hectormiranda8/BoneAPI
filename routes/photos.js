@@ -1,7 +1,10 @@
 import express from 'express';
 import crypto from 'crypto';
+import path from 'path';
 import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth.js';
 import { validatePhotoUpload } from '../middleware/validation.js';
+import { upload } from '../middleware/upload.js';
+import { optimizeImage, deleteFile } from '../utils/imageOptimizer.js';
 import {
   getDefaultPhotos,
   getUserPhotos,
@@ -13,10 +16,35 @@ import {
   isPhotoLikedByUser,
   addLike,
   removeLike,
-  getUserLikes
+  getUserLikes,
+  getPhotoCommentCount,
+  getTags,
+  getPopularTags,
+  getPhotosByCategory,
+  getPhotosByTag,
+  addOrUpdateTag
 } from '../utils/db.js';
 
 const router = express.Router();
+
+const VALID_CATEGORIES = [
+  'puppies',
+  'portraits',
+  'action',
+  'sleeping',
+  'playing',
+  'nature',
+  'group',
+  'other'
+];
+
+const normalizeTag = (tag) => {
+  return tag
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9-]/g, '')
+    .substring(0, 30);
+};
 
 /**
  * GET /api/photos
@@ -26,19 +54,34 @@ const router = express.Router();
  */
 router.get('/', optionalAuthMiddleware, async (req, res) => {
   try {
-    const photos = await getDefaultPhotos();
+    let photos = await getDefaultPhotos();
     const userId = req.user?.id;
+    const { getUsers } = await import('../utils/db.js');
+    const users = await getUsers();
 
-    // Add like counts and isLiked status
+    // Filter to only approved public photos
+    photos = photos.filter(p => p.isDefault === true && p.status === 'approved');
+
+    // Add like counts, comment counts, isLiked status, and user info
     const photosWithLikes = await Promise.all(
       photos.map(async (photo) => {
         const likeCount = await getPhotoLikeCount(photo.id);
+        const commentCount = await getPhotoCommentCount(photo.id);
         const isLiked = userId ? await isPhotoLikedByUser(photo.id, userId) : false;
+        const photoUser = users.find(u => u.id === photo.userId);
+
         const { userId: photoUserId, ...publicPhoto } = photo;
         return {
           ...publicPhoto,
           likeCount,
-          isLiked
+          commentCount,
+          isLiked,
+          user: photoUser ? {
+            id: photoUser.id,
+            username: photoUser.username,
+            displayName: photoUser.displayName || photoUser.username,
+            avatarUrl: photoUser.avatarUrl || null
+          } : null
         };
       })
     );
@@ -93,6 +136,8 @@ router.get('/liked', authMiddleware, async (req, res) => {
     const userId = req.user.id;
     const userLikes = await getUserLikes(userId);
     const photos = await getDefaultPhotos();
+    const { getUsers } = await import('../utils/db.js');
+    const users = await getUsers();
 
     // Get photos that user has liked
     const likedPhotos = await Promise.all(
@@ -101,12 +146,21 @@ router.get('/liked', authMiddleware, async (req, res) => {
         if (!photo) return null;
 
         const likeCount = await getPhotoLikeCount(photo.id);
+        const commentCount = await getPhotoCommentCount(photo.id);
+        const photoUser = users.find(u => u.id === photo.userId);
         const { userId: photoUserId, ...publicPhoto } = photo;
 
         return {
           ...publicPhoto,
           likeCount,
-          isLiked: true
+          commentCount,
+          isLiked: true,
+          user: photoUser ? {
+            id: photoUser.id,
+            username: photoUser.username,
+            displayName: photoUser.displayName || photoUser.username,
+            avatarUrl: photoUser.avatarUrl || null
+          } : null
         };
       })
     );
@@ -132,10 +186,77 @@ router.get('/liked', authMiddleware, async (req, res) => {
  * POST /api/photos/upload
  * Upload new photo for authenticated user
  * Protected endpoint - requires authentication
+ * Supports both file upload and URL
  */
-router.post('/upload', authMiddleware, validatePhotoUpload, async (req, res) => {
+router.post('/upload', authMiddleware, upload.single('image'), async (req, res) => {
   try {
-    const { title, description, imageUrl } = req.body;
+    let imageUrl;
+    const { title, description, category, tags } = req.body;
+
+    // Validate title
+    if (!title || title.trim() === '') {
+      if (req.file) {
+        deleteFile(req.file.path);
+      }
+      return res.status(400).json({
+        success: false,
+        error: 'Title is required',
+        statusCode: 400
+      });
+    }
+
+    if (req.file) {
+      // File upload - optimize and save
+      const webpFilename = path.basename(req.file.filename, path.extname(req.file.filename)) + '.webp';
+      const outputPath = path.join(path.dirname(req.file.path), webpFilename);
+
+      try {
+        await optimizeImage(req.file.path, outputPath);
+        imageUrl = `/uploads/${webpFilename}`;
+
+        // Delete original if not webp
+        if (req.file.path !== outputPath) {
+          deleteFile(req.file.path);
+        }
+      } catch (error) {
+        // Clean up on error
+        deleteFile(req.file.path);
+        deleteFile(outputPath);
+        throw error;
+      }
+    } else {
+      // URL upload
+      imageUrl = req.body.imageUrl;
+
+      if (!imageUrl || imageUrl.trim() === '') {
+        return res.status(400).json({
+          success: false,
+          error: 'Image URL or file is required',
+          statusCode: 400
+        });
+      }
+    }
+
+    // Process category
+    let photoCategory = 'puppies';
+    if (category && VALID_CATEGORIES.includes(category)) {
+      photoCategory = category;
+    }
+
+    // Process tags
+    let photoTags = [];
+    if (tags) {
+      const tagsArray = Array.isArray(tags) ? tags : JSON.parse(tags || '[]');
+      photoTags = tagsArray
+        .map(normalizeTag)
+        .filter(Boolean)
+        .slice(0, 10);
+
+      // Update tag counts
+      for (const tag of photoTags) {
+        await addOrUpdateTag(tag);
+      }
+    }
 
     // Create new photo object
     const newPhoto = {
@@ -145,6 +266,9 @@ router.post('/upload', authMiddleware, validatePhotoUpload, async (req, res) => 
       imageUrl,
       userId: req.user.id,
       isDefault: false,
+      status: 'private',
+      category: photoCategory,
+      tags: photoTags,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -215,6 +339,12 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         error: 'Failed to delete photo',
         statusCode: 500
       });
+    }
+
+    // Delete uploaded file if it exists
+    if (photo.imageUrl && photo.imageUrl.startsWith('/uploads/')) {
+      const filePath = path.join(path.dirname(import.meta.url.replace('file:///', '')), '../public', photo.imageUrl);
+      deleteFile(filePath);
     }
 
     res.json({
@@ -326,6 +456,7 @@ router.patch('/:id/visibility', authMiddleware, async (req, res) => {
   try {
     const photoId = req.params.id;
     const userId = req.user.id;
+    const { makePublic } = req.body;
 
     // Find photo by ID
     const photo = await findPhotoById(photoId);
@@ -348,10 +479,24 @@ router.patch('/:id/visibility', authMiddleware, async (req, res) => {
       });
     }
 
-    // Toggle isDefault (public/private)
-    const updatedPhoto = await updatePhoto(photoId, {
-      isDefault: !photo.isDefault
-    });
+    let updates = {};
+    let message = '';
+
+    if (makePublic) {
+      // User wants to make photo public → set to pending for approval
+      updates.status = 'pending';
+      updates.isDefault = false;
+      updates.updatedAt = new Date().toISOString();
+      message = 'Photo submitted for approval';
+    } else {
+      // User wants to make photo private → immediate, no approval needed
+      updates.status = 'private';
+      updates.isDefault = false;
+      updates.updatedAt = new Date().toISOString();
+      message = 'Photo is now private';
+    }
+
+    const updatedPhoto = await updatePhoto(photoId, updates);
 
     if (!updatedPhoto) {
       return res.status(500).json({
@@ -363,7 +508,7 @@ router.patch('/:id/visibility', authMiddleware, async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Photo visibility updated successfully',
+      message,
       photo: updatedPhoto
     });
   } catch (error) {
@@ -371,6 +516,259 @@ router.patch('/:id/visibility', authMiddleware, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to update photo visibility',
+      statusCode: 500
+    });
+  }
+});
+
+/**
+ * PATCH /api/photos/:id
+ * Update photo metadata (title, description, category, tags)
+ * Protected endpoint - requires authentication
+ */
+router.patch('/:id', authMiddleware, async (req, res) => {
+  try {
+    const photoId = req.params.id;
+    const userId = req.user.id;
+    const { title, description, category, tags } = req.body;
+
+    // Find photo by ID
+    const photo = await findPhotoById(photoId);
+
+    // Check if photo exists
+    if (!photo) {
+      return res.status(404).json({
+        success: false,
+        error: 'Photo not found',
+        statusCode: 404
+      });
+    }
+
+    // Check if photo belongs to authenticated user
+    if (photo.userId !== userId) {
+      return res.status(403).json({
+        success: false,
+        error: 'You do not have permission to modify this photo',
+        statusCode: 403
+      });
+    }
+
+    const updates = {};
+
+    if (title !== undefined) {
+      updates.title = title.substring(0, 100);
+    }
+
+    if (description !== undefined) {
+      updates.description = description.substring(0, 500);
+    }
+
+    if (category && VALID_CATEGORIES.includes(category)) {
+      updates.category = category;
+    }
+
+    if (tags && Array.isArray(tags)) {
+      const normalizedTags = tags
+        .map(normalizeTag)
+        .filter(Boolean)
+        .slice(0, 10);
+
+      updates.tags = normalizedTags;
+
+      // Update tag counts
+      for (const tag of normalizedTags) {
+        await addOrUpdateTag(tag);
+      }
+    }
+
+    const updatedPhoto = await updatePhoto(photoId, updates);
+
+    if (!updatedPhoto) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to update photo',
+        statusCode: 500
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Photo updated successfully',
+      photo: updatedPhoto
+    });
+  } catch (error) {
+    console.error('Error updating photo:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update photo',
+      statusCode: 500
+    });
+  }
+});
+
+/**
+ * GET /api/photos/category/:category
+ * Get photos by category
+ * Public endpoint - optional authentication
+ */
+router.get('/category/:category', optionalAuthMiddleware, async (req, res) => {
+  try {
+    const { category } = req.params;
+
+    if (!VALID_CATEGORIES.includes(category)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid category',
+        statusCode: 400
+      });
+    }
+
+    const photos = await getPhotosByCategory(category);
+    const userId = req.user?.id;
+    const { getUsers } = await import('../utils/db.js');
+    const users = await getUsers();
+
+    // Add like counts, comment counts, isLiked status, and user info
+    const photosWithLikes = await Promise.all(
+      photos.map(async (photo) => {
+        const likeCount = await getPhotoLikeCount(photo.id);
+        const commentCount = await getPhotoCommentCount(photo.id);
+        const isLiked = userId ? await isPhotoLikedByUser(photo.id, userId) : false;
+        const photoUser = users.find(u => u.id === photo.userId);
+
+        const { userId: photoUserId, ...publicPhoto } = photo;
+        return {
+          ...publicPhoto,
+          likeCount,
+          commentCount,
+          isLiked,
+          user: photoUser ? {
+            id: photoUser.id,
+            username: photoUser.username,
+            displayName: photoUser.displayName || photoUser.username,
+            avatarUrl: photoUser.avatarUrl || null
+          } : null
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      photos: photosWithLikes
+    });
+  } catch (error) {
+    console.error('Error fetching photos by category:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch photos',
+      statusCode: 500
+    });
+  }
+});
+
+/**
+ * GET /api/photos/tag/:tag
+ * Get photos by tag
+ * Public endpoint - optional authentication
+ */
+router.get('/tag/:tag', optionalAuthMiddleware, async (req, res) => {
+  try {
+    const { tag } = req.params;
+    const normalizedTag = normalizeTag(tag);
+
+    if (!normalizedTag) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid tag',
+        statusCode: 400
+      });
+    }
+
+    const photos = await getPhotosByTag(normalizedTag);
+    const userId = req.user?.id;
+    const { getUsers } = await import('../utils/db.js');
+    const users = await getUsers();
+
+    // Add like counts, comment counts, isLiked status, and user info
+    const photosWithLikes = await Promise.all(
+      photos.map(async (photo) => {
+        const likeCount = await getPhotoLikeCount(photo.id);
+        const commentCount = await getPhotoCommentCount(photo.id);
+        const isLiked = userId ? await isPhotoLikedByUser(photo.id, userId) : false;
+        const photoUser = users.find(u => u.id === photo.userId);
+
+        const { userId: photoUserId, ...publicPhoto } = photo;
+        return {
+          ...publicPhoto,
+          likeCount,
+          commentCount,
+          isLiked,
+          user: photoUser ? {
+            id: photoUser.id,
+            username: photoUser.username,
+            displayName: photoUser.displayName || photoUser.username,
+            avatarUrl: photoUser.avatarUrl || null
+          } : null
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      photos: photosWithLikes
+    });
+  } catch (error) {
+    console.error('Error fetching photos by tag:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch photos',
+      statusCode: 500
+    });
+  }
+});
+
+/**
+ * GET /api/tags
+ * Get all tags with counts
+ * Public endpoint
+ */
+router.get('/tags', async (req, res) => {
+  try {
+    const tags = await getTags();
+
+    res.json({
+      success: true,
+      tags: tags
+    });
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch tags',
+      statusCode: 500
+    });
+  }
+});
+
+/**
+ * GET /api/tags/popular
+ * Get popular tags (top 20)
+ * Public endpoint
+ */
+router.get('/tags/popular', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+    const tags = await getPopularTags(limit);
+
+    res.json({
+      success: true,
+      tags: tags
+    });
+  } catch (error) {
+    console.error('Error fetching popular tags:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch popular tags',
       statusCode: 500
     });
   }

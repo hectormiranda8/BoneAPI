@@ -88,7 +88,8 @@ export async function authMiddleware(req, res, next) {
     req.user = {
       id: user.id,
       username: user.username,
-      email: user.email
+      email: user.email,
+      isAdmin: user.isAdmin || false
     };
 
     next();

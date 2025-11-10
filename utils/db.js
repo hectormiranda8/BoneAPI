@@ -9,6 +9,8 @@ const DATA_DIR = path.join(__dirname, '..', 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const PHOTOS_FILE = path.join(DATA_DIR, 'photos.json');
 const LIKES_FILE = path.join(DATA_DIR, 'likes.json');
+const COMMENTS_FILE = path.join(DATA_DIR, 'comments.json');
+const TAGS_FILE = path.join(DATA_DIR, 'tags.json');
 
 async function readJSON(filePath) {
   try {
@@ -182,4 +184,138 @@ export async function updatePhoto(photoId, updates) {
 
   await savePhotos(photos);
   return photos[photoIndex];
+}
+
+export async function updateUser(userId, updates) {
+  const users = await getUsers();
+  const userIndex = users.findIndex(user => user.id === userId);
+
+  if (userIndex === -1) {
+    return null;
+  }
+
+  users[userIndex] = {
+    ...users[userIndex],
+    ...updates,
+    updatedAt: new Date().toISOString()
+  };
+
+  await saveUsers(users);
+  return users[userIndex];
+}
+
+// Comment-related functions
+export async function getComments() {
+  const comments = await readJSON(COMMENTS_FILE);
+  return comments || [];
+}
+
+export async function saveComments(comments) {
+  await ensureDataDir();
+  await writeJSON(COMMENTS_FILE, comments);
+}
+
+export async function addComment(comment) {
+  const comments = await getComments();
+  comments.push(comment);
+  await saveComments(comments);
+  return comment;
+}
+
+export async function getPhotoComments(photoId) {
+  const comments = await getComments();
+  return comments.filter(comment => comment.photoId === photoId);
+}
+
+export async function deleteComment(commentId) {
+  const comments = await getComments();
+  const filteredComments = comments.filter(comment => comment.id !== commentId);
+  await saveComments(filteredComments);
+  return filteredComments.length < comments.length;
+}
+
+export async function updateComment(commentId, content) {
+  const comments = await getComments();
+  const commentIndex = comments.findIndex(comment => comment.id === commentId);
+
+  if (commentIndex === -1) {
+    return null;
+  }
+
+  comments[commentIndex] = {
+    ...comments[commentIndex],
+    content,
+    updatedAt: new Date().toISOString()
+  };
+
+  await saveComments(comments);
+  return comments[commentIndex];
+}
+
+export async function findCommentById(id) {
+  const comments = await getComments();
+  return comments.find(comment => comment.id === id);
+}
+
+export async function getPhotoCommentCount(photoId) {
+  const comments = await getComments();
+  return comments.filter(comment => comment.photoId === photoId).length;
+}
+
+// Tag-related functions
+export async function getTags() {
+  const tags = await readJSON(TAGS_FILE);
+  return tags || [];
+}
+
+export async function saveTags(tags) {
+  await ensureDataDir();
+  await writeJSON(TAGS_FILE, tags);
+}
+
+export async function addOrUpdateTag(tagName) {
+  const tags = await getTags();
+  const existingTag = tags.find(t => t.tag === tagName);
+
+  if (existingTag) {
+    existingTag.count += 1;
+  } else {
+    tags.push({
+      tag: tagName,
+      count: 1,
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  await saveTags(tags);
+}
+
+export async function getPopularTags(limit = 20) {
+  const tags = await getTags();
+  return tags
+    .sort((a, b) => b.count - a.count)
+    .slice(0, limit);
+}
+
+export async function getPhotosByCategory(category) {
+  const photos = await getPhotos();
+  return photos.filter(photo => photo.category === category && photo.isDefault === true);
+}
+
+export async function getPhotosByTag(tag) {
+  const photos = await getPhotos();
+  return photos.filter(photo =>
+    photo.tags &&
+    photo.tags.includes(tag) &&
+    photo.isDefault === true
+  );
+}
+
+export async function getPhotosByTags(tags) {
+  const photos = await getPhotos();
+  return photos.filter(photo =>
+    photo.tags &&
+    tags.some(tag => photo.tags.includes(tag)) &&
+    photo.isDefault === true
+  );
 }
