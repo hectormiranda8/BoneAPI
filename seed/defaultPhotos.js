@@ -14,7 +14,10 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1633722715463-d30f4f325e24?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    category: 'portraits',
+    tags: ['golden-retriever', 'puppy', 'cute'],
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '2',
@@ -23,7 +26,10 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1568572933382-74d440642117?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    category: 'action',
+    tags: ['husky', 'playing', 'blue-eyes'],
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '3',
@@ -32,7 +38,10 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    category: 'portraits',
+    tags: ['beagle', 'floppy-ears', 'cute'],
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '4',
@@ -41,7 +50,10 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    category: 'puppies',
+    tags: ['labrador', 'yellow', 'puppy'],
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '5',
@@ -50,7 +62,10 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1612536024345-ba0c96a1b688?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    category: 'puppies',
+    tags: ['corgi', 'fluffy', 'short-legs'],
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '6',
@@ -59,7 +74,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '7',
@@ -68,7 +84,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1590005024662-41e2a2d66c4f?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '8',
@@ -77,7 +94,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '9',
@@ -86,7 +104,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '10',
@@ -95,7 +114,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '11',
@@ -104,7 +124,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '12',
@@ -113,7 +134,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1587402092301-725e37c70fd8?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '13',
@@ -122,7 +144,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1559123485-98c6f11b8cae?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '14',
@@ -131,7 +154,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1616794399573-ed8c1a610bde?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '15',
@@ -140,7 +164,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1583512603806-077998240c7a?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '16',
@@ -149,7 +174,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '18',
@@ -158,7 +184,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '19',
@@ -167,7 +194,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '20',
@@ -176,7 +204,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '21',
@@ -185,7 +214,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '22',
@@ -194,7 +224,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1516371535707-512a1e83bb9a?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '23',
@@ -203,7 +234,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1527526029430-319f10814151?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '24',
@@ -212,7 +244,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '25',
@@ -221,7 +254,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1588943211346-0908a1fb0b01?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '26',
@@ -230,7 +264,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1591160690555-5debfba289f0?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '27',
@@ -239,7 +274,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1617470334257-68839a87c425?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '28',
@@ -248,7 +284,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '29',
@@ -257,7 +294,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1568393691622-c7ba131d63b4?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '30',
@@ -266,7 +304,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1583511666407-5f06533f2113?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '31',
@@ -275,7 +314,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1520087619250-584c0cbd35e8?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '32',
@@ -284,7 +324,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1548681528-6a5c45b66b42?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '33',
@@ -293,7 +334,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '34',
@@ -302,7 +344,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1598133894008-61f7fdb8cc3a?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '35',
@@ -311,7 +354,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1598134493042-f90f45dc63fd?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '36',
@@ -320,7 +364,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1568572933382-74d440642117?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '37',
@@ -329,7 +374,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1623387641168-d9803ddd3f35?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '38',
@@ -338,7 +384,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '39',
@@ -347,7 +394,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1583512603806-077998240c7a?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '40',
@@ -356,7 +404,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '41',
@@ -365,7 +414,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '42',
@@ -374,7 +424,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '43',
@@ -383,7 +434,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '44',
@@ -392,7 +444,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '45',
@@ -401,7 +454,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '46',
@@ -410,7 +464,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1612536024345-ba0c96a1b688?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '47',
@@ -419,7 +474,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '48',
@@ -428,7 +484,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1568572933382-74d440642117?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '49',
@@ -437,7 +494,8 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1633722715463-d30f4f325e24?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   },
   {
     id: '50',
@@ -446,6 +504,7 @@ export const defaultPhotos = [
     imageUrl: 'https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=800&q=80',
     userId: null,
     isDefault: true,
-    createdAt: randomDate()
+    createdAt: randomDate(),
+    status: 'approved'
   }
 ];

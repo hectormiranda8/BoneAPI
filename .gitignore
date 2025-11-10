@@ -6,3 +6,5 @@ dist/
 build/
 data/
 package-lock.json
+public/uploads/*
+!public/uploads/.gitkeep
